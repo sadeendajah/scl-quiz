@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCL Quiz — Supply Chain & Logistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-mid: #1B3A52;
+    --teal: #00C9A7;
+    --teal-dim: #00A38A;
+    --amber: #FFB347;
+    --red: #FF6B6B;
+    --green: #6BCB77;
+    --white: #F4F7F5;
+    --muted: #8AA0B0;
+    --card-bg: #142233;
+    --border: rgba(255,255,255,0.07);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG grid pattern */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,201,167,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,167,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* glow blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 500px; height: 500px; background: var(--teal); top: -150px; left: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: #2563EB; bottom: -100px; right: -80px; }
+
+  /* ── NAV ── */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-badge {
+    background: var(--teal);
+    color: var(--navy);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+  }
+  .nav-meta { font-size: 0.8rem; color: var(--muted); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 4rem 1.5rem 2.5rem;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.2);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--teal);
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto 2rem;
+    line-height: 1.65;
+  }
+
+  /* stats row */
+  .stats-row {
+    display: flex; justify-content: center; gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--teal);
+    display: block;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--muted); }
+
+  /* mode switcher */
+  .mode-switcher {
+    display: inline-flex;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 2.5rem;
+    gap: 4px;
+  }
+  .mode-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 8px 20px;
+    border: none; border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+  .mode-btn.active {
+    background: var(--teal);
+    color: var(--navy);
+  }
+
+  /* ── QUIZ AREA ── */
+  .quiz-wrap {
+    position: relative; z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+  }
+
+  /* progress */
+  .progress-track {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), #6BCB77);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* score chips */
+  .score-row {
+    display: flex; gap: 10px; justify-content: center;
+    margin-bottom: 1.75rem; flex-wrap: wrap;
+  }
+  .chip {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .chip strong { color: var(--white); font-weight: 600; }
+  .chip svg { width: 14px; height: 14px; opacity: 0.6; }
+
+  /* question card */
+  .q-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.35s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .q-category {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(0,201,167,0.08);
+    border: 1px solid rgba(0,201,167,0.15);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 1.25rem;
+  }
+  .q-abbr {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .q-prompt {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.55;
+  }
+  .q-desc-mode .q-abbr {
+    font-size: 1rem;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+  .q-desc-mode .q-prompt {
+    font-size: 1.25rem;
+    color: var(--white);
+    font-weight: 500;
+    margin-bottom: 1.75rem;
+  }
+
+  /* options grid */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+
+  .opt {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--white);
+    text-align: left;
+    cursor: pointer;
+    line-height: 1.45;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .opt:hover:not(:disabled) {
+    background: rgba(0,201,167,0.07);
+    border-color: rgba(0,201,167,0.3);
+    transform: translateY(-1px);
+  }
+  .opt:disabled { cursor: default; }
+  .opt.correct {
+    background: rgba(107,203,119,0.15);
+    border-color: var(--green);
+    color: #a8f0b0;
+  }
+  .opt.wrong {
+    background: rgba(255,107,107,0.12);
+    border-color: var(--red);
+    color: #ffaaaa;
+  }
+  .opt.reveal {
+    background: rgba(0,201,167,0.1);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* feedback */
+  .feedback {
+    margin-top: 1rem;
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback.show { display: block; animation: fadeUp 0.2s ease; }
+  .feedback.correct { background: rgba(107,203,119,0.1); border: 1px solid rgba(107,203,119,0.25); color: #a8f0b0; }
+  .feedback.wrong { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.25); color: #ffaaaa; }
+
+  /* next button */
+  .next-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.9rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: var(--teal);
+    color: var(--navy);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: none;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .next-btn:active { transform: scale(0.98); }
+  .next-btn.show { display: block; }
+
+  /* ── END SCREEN ── */
+  .end-screen {
+    display: none;
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    animation: fadeUp 0.4s ease;
+  }
+  .end-screen.show { display: block; }
+  .trophy { font-size: 3.5rem; margin-bottom: 1rem; }
+  .end-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .end-out-of { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.75rem; }
+  .end-msg { font-size: 1.1rem; color: var(--white); margin-bottom: 2rem; line-height: 1.5; }
+
+  .end-bars { margin: 1.5rem 0; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.82rem; }
+  .bar-label { color: var(--muted); width: 110px; text-align: right; white-space: nowrap; }
+  .bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .bar-pct { color: var(--white); font-weight: 500; width: 36px; }
+
+  .restart-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.9rem 2.5rem;
+    background: var(--teal);
+    color: var(--navy);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .restart-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+  <div class="nav-logo">
+    <span class="logo-badge">SCL</span>
+    Quiz Game
+  </div>
+  <div class="nav-meta">Supply Chain &amp; Logistics</div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">
+    ✦ Interactive Learning Tool
+  </div>
+  <h1>Master the <em>Abbreviations</em><br>of Supply Chain</h1>
+  <p>Test your knowledge of the most important terms used in supply chain, logistics, warehousing, trade, and quality management.</p>
+
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">42</span><span class="stat-label">Abbreviations</span></div>
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">Categories</span></div>
+    <div class="stat"><span class="stat-num">10</span><span class="stat-label">Questions / Round</span></div>
+  </div>
+
+  <div class="mode-switcher">
+    <button class="mode-btn active" id="btn-abbr" onclick="setMode('abbr')">Abbr → Meaning</button>
+    <button class="mode-btn" id="btn-meaning" onclick="setMode('meaning')">Meaning → Abbr</button>
+  </div>
+</section>
+
+<div class="quiz-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="score-row">
+    <div class="chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Score <strong id="score">0</strong>
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Correct <strong id="correct-count">0</strong>
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Question <strong id="q-num">1</strong> / <strong>10</strong>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="q-card" id="q-card">
+    <div class="q-category" id="q-cat"></div>
+    <div class="q-abbr" id="q-abbr"></div>
+    <div class="q-prompt" id="q-prompt"></div>
+    <div class="options-grid" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQ()">Next question →</button>
+  </div>
+
+  <!-- End screen -->
+  <div class="end-screen" id="end-screen">
+    <div class="trophy">🏆</div>
+    <div class="end-score" id="end-score"></div>
+    <div class="end-out-of" id="end-out-of"></div>
+    <div class="end-msg" id="end-msg"></div>
+    <div class="end-bars" id="end-bars"></div>
+    <button class="restart-btn" onclick="restart()">Play Again ↺</button>
+  </div>
+</div>
+
+<footer>
+  Supply Chain &amp; Logistics Abbreviations Quiz &nbsp;·&nbsp; 42 essential terms
+  <br><br>
+  <span style="color:#00C9A7; font-family:'Syne',sans-serif; font-weight:600; font-size:0.85rem; letter-spacing:0.04em;">
+    Developed by &nbsp;Sadeen Aldajah
+  </span>
+</footer>
+
+<script>
+const DATA = [
+  {cat:"Supply Chain",abbr:"SCM",full:"Supply Chain Management",desc:"Managing the flow of goods, data, and finances from raw material to end customer."},
+  {cat:"Supply Chain",abbr:"S&OP",full:"Sales and Operations Planning",desc:"Integrated planning process aligning supply with demand across business functions."},
+  {cat:"Supply Chain",abbr:"MRP",full:"Material Requirements Planning",desc:"System for calculating materials needed to produce finished goods on schedule."},
+  {cat:"Supply Chain",abbr:"ERP",full:"Enterprise Resource Planning",desc:"Integrated software managing core business processes: finance, HR, and supply chain."},
+  {cat:"Supply Chain",abbr:"VMI",full:"Vendor Managed Inventory",desc:"Supplier monitors and replenishes the buyer's stock based on agreed parameters."},
+  {cat:"Supply Chain",abbr:"BOM",full:"Bill of Materials",desc:"Complete list of raw materials, components, and parts needed to manufacture a product."},
+  {cat:"Supply Chain",abbr:"EOQ",full:"Economic Order Quantity",desc:"Optimal order quantity that minimises total inventory holding and ordering costs."},
+  {cat:"Supply Chain",abbr:"JIT",full:"Just-In-Time",desc:"Strategy receiving goods only as they are needed, reducing inventory holding costs."},
+  {cat:"Logistics",abbr:"3PL",full:"Third-Party Logistics",desc:"Outsourcing logistics operations (warehousing, transport) to a specialised provider."},
+  {cat:"Logistics",abbr:"LTL",full:"Less-Than-Truckload",desc:"Shipping freight that does not fill a full truck — consolidated with other shipments."},
+  {cat:"Logistics",abbr:"FTL",full:"Full Truckload",desc:"Shipper books an entire truck for a single shipment, regardless of weight or volume."},
+  {cat:"Logistics",abbr:"FCL",full:"Full Container Load",desc:"Shipment fills an entire ocean container, booked exclusively by one shipper."},
+  {cat:"Logistics",abbr:"LCL",full:"Less-than-Container Load",desc:"Cargo from multiple shippers consolidated together into one ocean container."},
+  {cat:"Logistics",abbr:"ETA",full:"Estimated Time of Arrival",desc:"Predicted date and time a shipment is expected to reach its destination."},
+  {cat:"Logistics",abbr:"POD",full:"Proof of Delivery",desc:"Document signed by the recipient confirming goods were received in good condition."},
+  {cat:"Logistics",abbr:"BOL",full:"Bill of Lading",desc:"Legal contract between shipper and carrier detailing cargo, route, and terms."},
+  {cat:"Logistics",abbr:"TMS",full:"Transportation Management System",desc:"Software that plans, executes, and optimises the movement of freight."},
+  {cat:"Logistics",abbr:"TEU",full:"Twenty-foot Equivalent Unit",desc:"Standard measure of shipping container capacity based on a 20-foot container."},
+  {cat:"Warehousing",abbr:"WMS",full:"Warehouse Management System",desc:"Software controlling warehouse operations: receiving, storage, picking, and shipping."},
+  {cat:"Warehousing",abbr:"DC",full:"Distribution Center",desc:"Facility that receives, stores, and distributes products to retailers or customers."},
+  {cat:"Warehousing",abbr:"FIFO",full:"First In, First Out",desc:"Inventory rotation method where the oldest stock is used or sold first."},
+  {cat:"Warehousing",abbr:"RFID",full:"Radio Frequency Identification",desc:"Technology using electromagnetic fields to automatically identify and track tagged items."},
+  {cat:"Warehousing",abbr:"SKU",full:"Stock Keeping Unit",desc:"Unique identifier assigned to each distinct product for inventory tracking."},
+  {cat:"Warehousing",abbr:"MOQ",full:"Minimum Order Quantity",desc:"Smallest amount a supplier is willing to sell in a single order."},
+  {cat:"Warehousing",abbr:"ABC",full:"ABC Analysis",desc:"Inventory classification: A = high value, B = medium value, C = low value items."},
+  {cat:"Warehousing",abbr:"GRN",full:"Goods Receipt Note",desc:"Document confirming that goods have been received and inspected at a warehouse."},
+  {cat:"Trade",abbr:"FOB",full:"Free On Board",desc:"Seller delivers goods on board the vessel; buyer bears risk from that point onward."},
+  {cat:"Trade",abbr:"CIF",full:"Cost, Insurance and Freight",desc:"Seller pays costs, insurance, and freight charges to the destination port."},
+  {cat:"Trade",abbr:"EXW",full:"Ex Works",desc:"Buyer takes maximum responsibility — goods are collected at the seller's premises."},
+  {cat:"Trade",abbr:"DDP",full:"Delivered Duty Paid",desc:"Seller bears all costs and risks, including import duties, to the named destination."},
+  {cat:"Trade",abbr:"LC",full:"Letter of Credit",desc:"Bank guarantee ensuring the seller receives payment once agreed conditions are met."},
+  {cat:"Trade",abbr:"HS",full:"Harmonised System",desc:"International nomenclature for classifying products in international trade."},
+  {cat:"Trade",abbr:"AWB",full:"Air Waybill",desc:"Non-negotiable transport document for air cargo, serving as a contract of carriage."},
+  {cat:"Trade",abbr:"C/O",full:"Certificate of Origin",desc:"Document certifying the country in which the shipped goods were manufactured."},
+  {cat:"Quality",abbr:"KPI",full:"Key Performance Indicator",desc:"Measurable value showing how effectively a company achieves key business objectives."},
+  {cat:"Quality",abbr:"OTIF",full:"On Time In Full",desc:"KPI tracking deliveries made on time AND with complete quantity and specifications."},
+  {cat:"Quality",abbr:"SLA",full:"Service Level Agreement",desc:"Contract defining agreed performance standards between service provider and client."},
+  {cat:"Quality",abbr:"RFQ",full:"Request for Quotation",desc:"Formal document asking suppliers to provide pricing for specific goods or services."},
+  {cat:"Quality",abbr:"RFP",full:"Request for Proposal",desc:"Solicitation asking suppliers to propose solutions to meet defined requirements."},
+  {cat:"Quality",abbr:"TCO",full:"Total Cost of Ownership",desc:"All direct and indirect costs associated with acquiring and using a product or service."},
+  {cat:"Quality",abbr:"EDI",full:"Electronic Data Interchange",desc:"Structured electronic format for exchanging business documents between organisations."},
+  {cat:"Quality",abbr:"PO",full:"Purchase Order",desc:"Buyer's formal document authorising a purchase transaction with a supplier."},
+];
+
+const CAT_COLORS = {
+  "Supply Chain": "#00C9A7",
+  "Logistics": "#60A5FA",
+  "Warehousing": "#A78BFA",
+  "Trade": "#FB923C",
+  "Quality": "#F472B6"
+};
+
+const Q_COUNT = 10;
+let questions=[], idx=0, score=0, correct=0, mode='abbr', answered=false;
+let catCorrect={}, catTotal={};
+
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('btn-abbr').className='mode-btn'+(m==='abbr'?' active':'');
+  document.getElementById('btn-meaning').className='mode-btn'+(m==='meaning'?' active':'');
+  restart();
+}
+
+function buildQuestions(){
+  let picked = shuffle(DATA).slice(0,Q_COUNT);
+  questions = picked.map(item=>{
+    let wrongs = shuffle(DATA.filter(x=>x!==item)).slice(0,3);
+    return {item, opts: shuffle([item,...wrongs])};
+  });
+  catCorrect={}; catTotal={};
+  questions.forEach(q=>{ catTotal[q.item.cat]=(catTotal[q.item.cat]||0)+1; });
+}
+
+function showQuestion(){
+  answered=false;
+  const {item,opts}=questions[idx];
+  document.getElementById('q-num').textContent=idx+1;
+  document.getElementById('progress').style.width=(idx/Q_COUNT*100)+'%';
+  const col=CAT_COLORS[item.cat]||'#00C9A7';
+  document.getElementById('q-cat').innerHTML=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:5px"></span>${item.cat}`;
+  document.getElementById('q-cat').style.color=col;
+  document.getElementById('q-cat').style.borderColor=col+'33';
+  document.getElementById('q-cat').style.background=col+'12';
+
+  const card=document.getElementById('q-card');
+  if(mode==='abbr'){
+    card.classList.remove('q-desc-mode');
+    document.getElementById('q-abbr').textContent=item.abbr;
+    document.getElementById('q-abbr').style.color=col;
+    document.getElementById('q-prompt').textContent='What does this abbreviation stand for?';
+  } else {
+    card.classList.add('q-desc-mode');
+    document.getElementById('q-abbr').textContent=item.abbr;
+    document.getElementById('q-prompt').textContent=item.desc;
+  }
+
+  const og=document.getElementById('options');
+  og.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.textContent=mode==='abbr'?opt.full:opt.abbr;
+    b.onclick=()=>answer(b,opt,item);
+    og.appendChild(b);
+  });
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('next-btn').className='next-btn';
+  card.style.animation='none';
+  requestAnimationFrame(()=>{ card.style.animation=''; });
+}
+
+function answer(btn,chosen,correct_item){
+  if(answered) return;
+  answered=true;
+  const isCorrect=chosen===correct_item;
+  document.querySelectorAll('.opt').forEach(b=>{
+    b.disabled=true;
+    const label=b.textContent;
+    const match=questions[idx].opts.find(o=>(mode==='abbr'?o.full:o.abbr)===label);
+    if(match===correct_item && b!==btn) b.classList.add('reveal');
+  });
+  const fb=document.getElementById('feedback');
+  if(isCorrect){
+    btn.classList.add('correct');
+    score+=10; correct++;
+    catCorrect[correct_item.cat]=(catCorrect[correct_item.cat]||0)+1;
+    document.getElementById('score').textContent=score;
+    document.getElementById('correct-count').textContent=correct;
+    fb.className='feedback correct show';
+    fb.innerHTML=`✓ <strong>Correct!</strong> ${correct_item.abbr} stands for ${correct_item.full}`;
+  } else {
+    btn.classList.add('wrong');
+    fb.className='feedback wrong show';
+    fb.innerHTML=`✗ <strong>Not quite.</strong> The correct answer is <strong>${mode==='abbr'?correct_item.full:correct_item.abbr}</strong>`;
+  }
+  document.getElementById('next-btn').className='next-btn show';
+}
+
+function nextQ(){
+  idx++;
+  if(idx>=Q_COUNT){ showEnd(); return; }
+  showQuestion();
+}
+
+function showEnd(){
+  document.getElementById('progress').style.width='100%';
+  document.getElementById('q-card').style.display='none';
+  const pct=Math.round(correct/Q_COUNT*100);
+  const es=document.getElementById('end-screen');
+  es.className='end-screen show';
+  document.getElementById('end-score').textContent=score+' pts';
+  document.getElementById('end-out-of').textContent=correct+' out of '+Q_COUNT+' correct ('+pct+'%)';
+  const msg=pct>=90?'Outstanding! You are a supply chain expert 🎯':
+             pct>=70?'Great job! You know your terms well 👏':
+             pct>=50?'Good effort — keep reviewing the terms 📚':
+                     'Keep studying, you will get there! 💪';
+  document.getElementById('end-msg').textContent=msg;
+
+  // category breakdown bars
+  const barsEl=document.getElementById('end-bars');
+  barsEl.innerHTML='';
+  Object.keys(catTotal).forEach(cat=>{
+    const c=catCorrect[cat]||0, t=catTotal[cat];
+    const p=Math.round(c/t*100);
+    const col=CAT_COLORS[cat]||'#00C9A7';
+    barsEl.innerHTML+=`
+      <div class="bar-row">
+        <div class="bar-label" style="color:${col}">${cat}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:0%;background:${col}" data-w="${p}"></div>
+        </div>
+        <div class="bar-pct">${p}%</div>
+      </div>`;
+  });
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill').forEach(el=>{
+      el.style.width=el.dataset.w+'%';
+    });
+  },100);
+}
+
+function restart(){
+  idx=0; score=0; correct=0; answered=false;
+  document.getElementById('score').textContent=0;
+  document.getElementById('correct-count').textContent=0;
+  document.getElementById('q-card').style.display='block';
+  document.getElementById('end-screen').className='end-screen';
+  buildQuestions();
+  showQuestion();
+}
+
+buildQuestions();
+showQuestion();
+</script>
+</body>
+</html>
